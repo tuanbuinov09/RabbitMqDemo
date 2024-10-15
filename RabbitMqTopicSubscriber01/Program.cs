@@ -10,12 +10,11 @@ IConnection connection = factory.CreateConnection();
 
 IModel channel = connection.CreateModel();
 
-string exchangeName = "MyExchange";
-string routingKey = "my-routing-key";
-string queueName = "MyQueue";
+string exchangeName = "MyTopic";
+string routingKey = "*.mytopic.*";
+string queueName = channel.QueueDeclare().QueueName;
 
-channel.ExchangeDeclare(exchangeName, ExchangeType.Direct);//Fanout, Direct, Topic, Headers
-channel.QueueDeclare(queueName, false, false, false, null);
+channel.ExchangeDeclare(exchangeName, ExchangeType.Topic);
 channel.QueueBind(queueName, exchangeName, routingKey, null);
 
 channel.BasicQos(0, 1, false);

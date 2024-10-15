@@ -30,7 +30,7 @@ consumer.Received += (sender, args) =>
 
     string message = Encoding.UTF8.GetString(body);
 
-    Console.WriteLine($"Consumer 02 received: \"{message}\"");
+    Console.WriteLine($"Consumer 02 received: {args.RoutingKey} : \"{message}\"");
 
     channel.BasicAck(args.DeliveryTag, false);
 };

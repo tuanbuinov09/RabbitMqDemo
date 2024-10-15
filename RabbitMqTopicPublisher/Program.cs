@@ -9,19 +9,16 @@ IConnection connection = factory.CreateConnection();
 
 IModel channel = connection.CreateModel();
 
-string exchangeName = "MyExchange";
-string routingKey = "my-routing-key";
-string queueName = "MyQueue";
+string exchangeName = "MyTopic";
+string routingKey = "all.mytopic.subscriber";
 
-channel.ExchangeDeclare(exchangeName, ExchangeType.Direct);//Fanout, Direct, Topic, Headers
-channel.QueueDeclare(queueName, false, false, false, null);
-channel.QueueBind(queueName, exchangeName, routingKey, null);
+channel.ExchangeDeclare(exchangeName, ExchangeType.Topic);
 
 for (int i = 1; i <= 10; i++)
 {
     Console.WriteLine($"Sending Message #{i}");
 
-    byte[] messageBody = Encoding.UTF8.GetBytes($"Message #{i}");
+    byte[] messageBody = Encoding.UTF8.GetBytes($"Topic message #{i}");
     channel.BasicPublish(exchangeName, routingKey, null, messageBody);
 
     Task.Delay(TimeSpan.FromMilliseconds(500), CancellationToken.None).Wait();

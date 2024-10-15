@@ -10,12 +10,11 @@ IConnection connection = factory.CreateConnection();
 
 IModel channel = connection.CreateModel();
 
-string exchangeName = "MyExchange";
-string routingKey = "my-routing-key";
-string queueName = "MyQueue";
+string exchangeName = "MyTopic";
+string routingKey = "*.mytopic.*";
+string queueName = channel.QueueDeclare().QueueName;
 
-channel.ExchangeDeclare(exchangeName, ExchangeType.Direct);//Fanout, Direct, Topic, Headers
-channel.QueueDeclare(queueName, false, false, false, null);
+channel.ExchangeDeclare(exchangeName, ExchangeType.Topic);
 channel.QueueBind(queueName, exchangeName, routingKey, null);
 
 channel.BasicQos(0, 1, false);
@@ -24,13 +23,13 @@ var consumer = new EventingBasicConsumer(channel);
 
 consumer.Received += (sender, args) =>
 {
-    Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None).Wait();
+    Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).Wait();
 
     var body = args.Body.ToArray();
 
     string message = Encoding.UTF8.GetString(body);
 
-    Console.WriteLine($"Consumer 01 received: {args.RoutingKey} : \"{message}\"");
+    Console.WriteLine($"Consumer 02 received: {args.RoutingKey} : \"{message}\"");
 
     channel.BasicAck(args.DeliveryTag, false);
 };
